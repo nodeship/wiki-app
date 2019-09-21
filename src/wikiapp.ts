@@ -1,8 +1,10 @@
 import {ArticleService} from './article.service';
 import { Article } from './article.interface';
-const articleTemplate = require('./articles.html');
 import {compile, template} from 'handlebars';
-import {LocalStorageService} from './local-storage.service';
+import {StorageService} from './storage.service';
+
+const articleTemplate = require('./articles.html');
+const likedArticlesTemplate = require('./liked-articles.html');
 
 export class WikiApp {
 
@@ -13,28 +15,34 @@ export class WikiApp {
   likedArticles: Partial<Article>[] = [];
 
   element: HTMLElement | null = null;
+  likedArticlesElement: HTMLElement | null = null;
   // dependency injection
   constructor(
     private articleService: ArticleService,
-    private localStorageService: LocalStorageService
+    private localStorageService: StorageService
     ) {
     this.getElementRef();
   }
 
   async start() {
     this.sync();
+    this.render(this.mapToTemplate({likedArticles: this.likedArticles}, likedArticlesTemplate), this.likedArticlesElement);
     // fetch articles and render
-    for await (let article of this.articleService.getManyArticlesPromises(1)) {
+    for await (let article of this.articleService.getManyArticlesPromises(20)) {
       this.articles.push(article);
-      this.render(this.mapToTemplate([article]).join('\n'));
+      this.render(this.mapToTemplate({ article }, articleTemplate ), this.element, true);
     };
     this.bindClickHandlers();
   }
 
-  render(template: string) {
+  render(template: string, element: HTMLElement | null, append?: boolean) {
     // render to HTML
-    if (this.element !== null) {
-      this.element.insertAdjacentHTML('beforeend', template);
+    if (element !== null) {
+      if (append) {
+        element.insertAdjacentHTML('beforeend', template);
+      } else {
+        element.innerHTML = template;
+      }
     }
   }
 
@@ -45,23 +53,21 @@ export class WikiApp {
 
   getElementRef() {
       this.element = document.querySelector('#articles');
+      this.likedArticlesElement = document.querySelector('liked-articles')
   }
 
   refresh() {
     // refresh articles and render again
   }
 
-  mapToTemplate(articles: Article[]) {
-    // map articles object to template
-    return articles.map(article => {
-      const templateDelegate = compile(articleTemplate);
-      const template = templateDelegate({article});
+  mapToTemplate(data: object, templateString: string) {
+      const templateDelegate = compile(templateString);
+      const template = templateDelegate(data);
       return template;
-    });
   }
 
   bindClickHandlers() {
-    let articles = Array.from(document.getElementsByClassName('like-article'));
+    let articles = Array.from(document.querySelectorAll('.card-body>.like-article'));
     articles.forEach( article => article.addEventListener('click', event => {
       const likeButton = event.target as HTMLElement;
       const article = this.articles.find(article => likeButton.dataset.pageId === String(article.pageid));
@@ -84,7 +90,7 @@ export class WikiApp {
     } else {
       article.liked = false;
       let index = this.likedArticles.findIndex( article => article.pageid === pageid && article.title === title );
-      if (index >= 0)  delete this.likedArticles[index];
+      if (index >= 0)  this.likedArticles.splice(index, 1);
     }
 
     this.localStorageService.setItem(this.storageKey, this.likedArticles);

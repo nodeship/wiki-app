@@ -7,6 +7,7 @@ const { CheckerPlugin } = require('awesome-typescript-loader');
 
 module.exports = (env) =>({
   mode: env.mode,
+  devtool: 'source-map',
   entry: {
     app:'./src/index.ts',
     styles: './src/styles.css'
@@ -55,7 +56,7 @@ module.exports = (env) =>({
   devServer: {
     hot: true,
     writeToDisk: true,
-    port: 9000,
+    port: 3333,
     contentBase: path.resolve(__dirname, './dist')
   },
   plugins: [

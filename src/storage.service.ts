@@ -1,4 +1,4 @@
-export class LocalStorageService {
+export class StorageService {
 
     getItem<T>(key: string): T | string | null {
         const value = window.localStorage.getItem(key) ;

@@ -7,12 +7,12 @@
 import './styles.css';
 import { ArticleService } from "./article.service";
 import { WikiApp} from './wikiapp';
-import { LocalStorageService} from './local-storage.service'
+import { StorageService} from './storage.service'
 
 const articleService = new ArticleService();
-const localStorageService = new LocalStorageService();
+const storageService = new StorageService();
 
-export const wikiApp = new WikiApp(articleService, localStorageService);
+export const wikiApp = new WikiApp(articleService, storageService);
 
 wikiApp.start();
 
