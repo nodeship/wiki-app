@@ -1,8 +1,8 @@
 export class LocalStorageService {
 
-    getItem<T>(key: string): T {
-        const value = window.localStorage.getItem(key) as T;
-        return value ? JSON.parse(value) : value;
+    getItem<T>(key: string): T | string | null {
+        const value = window.localStorage.getItem(key) ;
+        return value ? JSON.parse(value) as T : value;
     }
 
     setItem(key: string, value: object) {
