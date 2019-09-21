@@ -26,6 +26,7 @@
     "dist/**/*"
   ],
   "dependencies": {
+    "handlebars": "^4.2.0",
     "html-loader": "^0.5.5",
     "xeta": "^1.0.0"
   },

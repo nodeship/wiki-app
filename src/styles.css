@@ -1,0 +1,30 @@
+.like-article {
+  background: rgb(231, 229, 229);
+}
+
+.like-article.liked {
+   background: white;
+  color:  red;
+  outline: none;
+}
+
+
+.like-article.liked:active {
+  background: white;
+  color: black;
+}
+
+
+.like-article > i {
+  pointer-events: none;
+}
+
+.like-article:active {
+    background: white;
+    color:  red;
+    outline: none;
+}
+
+.like-article:focus {
+  box-shadow: none;
+}

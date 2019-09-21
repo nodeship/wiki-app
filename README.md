@@ -27,15 +27,20 @@ $ yarn add wiki-app
 
 ## Usage
 
-> Random wikipedia App
-
-```js
-
-  const { wikiApp } = require('wiki-app');
-
-  wikiApp(); // hello universe
-
-```
+- As a user, I can see a list of random wikipedia articles (at least 5)
+- As a developer, I can use a service to get random wikipedia requests
+- Make an http request to wikipedia rest api on page load
+- As a developer, I can display the fetched wikipedia articles in the ui
+- Get array of wikipedia articles
+- Iterate over array and generate template
+- Append template to dom
+- As a user I can click on 'read more' to be redirected to the article webpage in a new tab
+- As a user I can click a button to view next 5 random articles
+- Add a button to UI
+- Add a click handler to button
+- Use Articles service to get 5 more articles
+- Iterate over array to generate new template
+- Append template to Dom
 
 ## License
 

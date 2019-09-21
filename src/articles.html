@@ -1,9 +1,9 @@
 <div class="card">
-  <img class="card-img-top" src="{{ imgSrc }}" alt="Card image cap">
+  <img class="card-img-top" src="{{ article.thumbnail.source }}" alt="Card image cap">
   <div class="card-body">
-    <h5 class="card-title">{{ title }}</h5>
-    <p class="card-text">{{ summary }}</p>
-    <a href="{{ readMore }}" class="btn btn-primary">Read More</a>
-    <button class="like-article"><i class="fas fa-heart"></i></button>
+    <h5 class="card-title">{{ article.title }}</h5>
+    <p class="card-text">{{ article.extract }}</p>
+    <a href="{{ article.content_urls.desktop.page }}" target="__blank" class="btn btn-primary">Read More</a>
+    <button data-page-id="{{article.pageid}}" class="btn btn-default btn-square float-right like-article"><i class="fas fa-heart"></i></button>
   </div>
 </div>

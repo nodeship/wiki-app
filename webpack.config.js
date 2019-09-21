@@ -8,7 +8,8 @@ const { CheckerPlugin } = require('awesome-typescript-loader');
 module.exports = (env) =>({
   mode: env.mode,
   entry: {
-    app:'./src/index.ts'
+    app:'./src/index.ts',
+    styles: './src/styles.css'
   },
   output: {
     path: path.resolve(__dirname, './dist'),

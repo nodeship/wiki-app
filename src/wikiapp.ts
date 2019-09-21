@@ -1,19 +1,47 @@
 import {ArticleService} from './article.service';
 import { Article } from './article.interface';
 const articleTemplate = require('./articles.html');
+import {compile, template} from 'handlebars';
+import {LocalStorageService} from './local-storage.service';
+
 export class WikiApp {
+
+  storageKey = 'wiki-liked';
+
+  articles: Article[] = [];
+
+  likedArticles: Partial<Article>[] = [];
 
   element: HTMLElement | null = null;
   // dependency injection
-  constructor(private articleService: ArticleService) {
+  constructor(
+    private articleService: ArticleService, 
+    private localStorageService: LocalStorageService
+    ) {
     this.getElementRef();
   }
 
   async start() {
+    this.sync();
     console.log(articleTemplate);
     // fetch articles and render
-    const articles = await this.articleService.get(3);
-    this.render(this.mapToTemplate(articles).join('\n'));
+    for await (let article of this.articleService.getManyArticlesPromises(1)) {
+      this.articles.push(article);
+      this.render(this.mapToTemplate([article]).join('\n'));
+    };
+    this.bindClickHandlers();
+  }
+
+  render(template: string) {
+    // render to HTML
+    if (this.element !== null) {
+      this.element.insertAdjacentHTML('beforeend', template);
+    }
+  }
+
+  sync() {
+    const likedArticles = this.localStorageService.getItem<Article[]>('wiki-liked');
+    if (likedArticles) this.likedArticles = likedArticles;
   }
 
   getElementRef() {
@@ -26,22 +54,36 @@ export class WikiApp {
 
   mapToTemplate(articles: Article[]) {
     // map articles object to template
-    return articles.map(article => `<div class="card">
-    <img class="card-img-top" src="${article.thumbnail.source}" alt="Card image cap">
-    <div class="card-body">
-      <h5 class="card-title">${article.title}</h5>
-      <p class="card-text">${article.extract}</p>
-      <a href="${article.content_urls.desktop}" class="btn btn-primary">Read More</a>
-      <button><i class="fas fa-heart"></i></button>
-    </div>
-  </div>`);
+    return articles.map(article => {
+      const templateDelegate = compile(articleTemplate);
+      const template = templateDelegate({article});
+      return template;
+    });
   }
 
-  render(template: string) {
-    // render to HTML
-    if (this.element !== null) {
-      this.element.innerHTML = template;
-    }
+  bindClickHandlers() {
+    let articles = Array.from(document.getElementsByClassName('like-article'));
+    articles.forEach( article => article.addEventListener('click', event => {
+      const likeButton = event.target as HTMLElement;
+      const article = this.articles.find(article => likeButton.dataset.pageId === String(article.pageid));
+      console.table(article);
+      likeButton.classList.toggle('liked');
+    }));
   }
+
+  like(article: Article) {
+    const { pageid, title, content_urls } = article;
+    article.liked = true;
+    this.likedArticles.push({pageid, title, content_urls});
+    this.localStorageService.setItem(this.storageKey, this.likedArticles)
+  }
+
+  unlike(article: Article) {
+    const { pageid, title } = article;
+    article.liked = false;
+    this.likedArticles.remove( article => article.pageid === pageid && article.title === title );
+    this.localStorageService.setItem(this.storageKey, this.likedArticles)
+  }
+
 }
 
